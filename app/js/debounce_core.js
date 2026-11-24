@@ -13,7 +13,6 @@
  *   - GAP_HARD <= gap < GAP_SOFT (60) AND
  *       hold < HOLD_SHORT (30)                 -> bounce, drop.
  *   - otherwise                                -> real press, keep.
- * Optional (off by default): drop a lone contact held < LONE_HOLD (15) ms.
  *
  * No DOM, no timers, no globals here. Works in the browser and in Node.
  */
@@ -26,8 +25,6 @@
     GAP_HARD: 45,   // ms: same-key gap below this is always a bounce
     GAP_SOFT: 60,   // ms: between HARD and SOFT, only a bounce if the hold is short
     HOLD_SHORT: 30, // ms: "short" hold used by the soft-gap clause
-    dropLoneShort: false,
-    LONE_HOLD: 15,  // ms: a lone contact shorter than this is dropped when the flag is on
   };
 
   /**
@@ -42,10 +39,6 @@
 
     if (gap < opts.GAP_HARD) return false;
     if (gap < opts.GAP_SOFT && hold != null && hold < opts.HOLD_SHORT) return false;
-    if (opts.dropLoneShort && hold != null && hold < opts.LONE_HOLD && !(gap < opts.GAP_SOFT)) {
-      // A short, isolated contact (no near same-key neighbour) — a leading ghost.
-      return false;
-    }
     return true;
   }
 

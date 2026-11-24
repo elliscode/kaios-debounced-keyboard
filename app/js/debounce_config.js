@@ -8,6 +8,11 @@
  *
  * Settings service (`keyboard.debounce.*`) is a fallback when no local config
  * exists, for anyone driving the values from a privileged page.
+ *
+ * Same-key cooldown is per input mode (COOLDOWN_T9, COOLDOWN_Abc, ...; the
+ * modes come from keypad.js _setModes). The old single COOLDOWN is still read:
+ * saved JSON that has COOLDOWN but none of the per-mode keys is migrated into
+ * all five, and debounce.js falls back to COOLDOWN for any other mode.
  */
 
 (function () {
@@ -18,15 +23,26 @@
     GAP_HARD: 45,
     GAP_SOFT: 60,
     HOLD_SHORT: 30,
-    LONE_HOLD: 15,
-    COOLDOWN: 100,
-    dropLoneShort: false,
+    COOLDOWN: 110,          // legacy / fallback for modes without their own key
+    COOLDOWN_T9: 110,
+    COOLDOWN_Abc: 110,
+    COOLDOWN_abc: 110,
+    COOLDOWN_ABC: 110,
+    COOLDOWN_123: 110,
+    SELECT_COOLDOWN: 1000,  // Enter: drop a repeat within this many ms
     showMarker: false,
     debug: false,
   };
 
-  var FIELDS = ["enabled", "GAP_HARD", "GAP_SOFT", "HOLD_SHORT", "LONE_HOLD", "COOLDOWN", "dropLoneShort", "showMarker", "debug"];
-  var INT_RANGES = { GAP_HARD: [0, 500], GAP_SOFT: [0, 500], HOLD_SHORT: [0, 500], LONE_HOLD: [0, 500], COOLDOWN: [0, 1000] };
+  var MODES = ["T9", "Abc", "abc", "ABC", "123"];
+  var MODE_FIELDS = MODES.map(function (m) { return "COOLDOWN_" + m; });
+  var FIELDS = ["enabled", "GAP_HARD", "GAP_SOFT", "HOLD_SHORT", "COOLDOWN"]
+    .concat(MODE_FIELDS, ["SELECT_COOLDOWN", "showMarker", "debug"]);
+  var INT_RANGES = {
+    GAP_HARD: [0, 500], GAP_SOFT: [0, 500], HOLD_SHORT: [0, 500],
+    COOLDOWN: [0, 1000], SELECT_COOLDOWN: [0, 2000],
+  };
+  MODE_FIELDS.forEach(function (f) { INT_RANGES[f] = [0, 1000]; });
   var LKEY = "keyboard.debounce.v1";
 
   var SETTINGS_MAP = {
@@ -34,9 +50,13 @@
     "keyboard.debounce.gapHard": "GAP_HARD",
     "keyboard.debounce.gapSoft": "GAP_SOFT",
     "keyboard.debounce.holdShort": "HOLD_SHORT",
-    "keyboard.debounce.loneHold": "LONE_HOLD",
     "keyboard.debounce.cooldown": "COOLDOWN",
-    "keyboard.debounce.dropLoneShort": "dropLoneShort",
+    "keyboard.debounce.cooldownT9": "COOLDOWN_T9",
+    "keyboard.debounce.cooldownAbc": "COOLDOWN_Abc",
+    "keyboard.debounce.cooldownabc": "COOLDOWN_abc",
+    "keyboard.debounce.cooldownABC": "COOLDOWN_ABC",
+    "keyboard.debounce.cooldown123": "COOLDOWN_123",
+    "keyboard.debounce.selectCooldown": "SELECT_COOLDOWN",
     "keyboard.debounce.showMarker": "showMarker",
     "keyboard.debounce.debug": "debug",
   };
@@ -47,7 +67,7 @@
   var localSeen = false;
 
   function coerce(field, raw) {
-    if (field === "enabled" || field === "dropLoneShort" || field === "showMarker" || field === "debug") {
+    if (field === "enabled" || field === "showMarker" || field === "debug") {
       if (typeof raw === "string") return raw === "true" || raw === "1" || raw === "on";
       return !!raw;
     }
@@ -66,14 +86,31 @@
     return true;
   }
 
-  function applyJson(text) {
-    var obj = JSON.parse(text);
+  // Old configs had one COOLDOWN for every mode: copy it into the per-mode
+  // keys when none of them is present. Returns a new object; input untouched.
+  function migrate(obj) {
+    var has = Object.prototype.hasOwnProperty;
+    if (!obj || !has.call(obj, "COOLDOWN")) return obj;
+    for (var i = 0; i < MODE_FIELDS.length; i++) if (has.call(obj, MODE_FIELDS[i])) return obj;
+    var out = Object.assign({}, obj);
+    MODE_FIELDS.forEach(function (f) { out[f] = obj.COOLDOWN; });
+    return out;
+  }
+
+  function applyObj(obj) {
+    obj = migrate(obj);
     var changed = false;
     FIELDS.forEach(function (f) {
       if (Object.prototype.hasOwnProperty.call(obj, f) && applyField(f, obj[f])) changed = true;
     });
     if (changed) notify();
     return changed;
+  }
+
+  function applyJson(text) {
+    var obj = JSON.parse(text);
+    if (!obj || typeof obj !== "object") return false;
+    return applyObj(obj);
   }
 
   function snapshot() {
@@ -131,12 +168,12 @@
     if (localSeen || !settingsReady()) return Promise.resolve(values);
     return observer().getBatch(Object.keys(SETTINGS_MAP)).then(function (list) {
       if (localSeen) return values;
-      var changed = false;
+      var obj = {};
       (list || []).forEach(function (item) {
         if (!item || item.value === undefined || item.value === "") return;
-        if (applyField(SETTINGS_MAP[item.name], item.value)) changed = true;
+        if (SETTINGS_MAP[item.name]) obj[SETTINGS_MAP[item.name]] = item.value;
       });
-      if (changed) notify();
+      applyObj(obj);
       return values;
     }).catch(function () { return values; });
   }
@@ -176,7 +213,10 @@
   window.DebounceConfig = {
     DEFAULTS: DEFAULTS,
     FIELDS: FIELDS,
+    MODES: MODES,
+    INT_RANGES: INT_RANGES,
     LKEY: LKEY,
+    migrate: migrate,
     values: values,
     onChange: function (fn) { listeners.push(fn); return fn; },
     reload: readLocal,

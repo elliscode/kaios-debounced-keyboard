@@ -440,13 +440,3 @@ body {
     font-size: 2.8rem;
   }
 }
-
-/* === TEMP BUILD MARKER (deployment verification; remove for final build) ===
-   This phone has no on-screen keyboard; the candidate/composing bar is the only
-   visible surface. Make it unmistakably pink so we can tell OUR build is live. */
-#candidates {
-  background: #ff33aa !important;
-  border-top: 4px solid #aa0066 !important;
-}
-#candidates .candidates-item,
-#candidates-scrollable { color: #ffffff !important; }

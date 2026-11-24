@@ -1,0 +1,234 @@
+{
+  "enabled": true,
+  "rules": {
+    "4": {
+      "first": "I"
+    },
+    "43": {
+      "he": [
+        "said",
+        "when",
+        "because",
+        "then",
+        "think",
+        "hope",
+        "until",
+        "and",
+        "but"
+      ],
+      "if": [
+        "even",
+        "as",
+        "see",
+        "what",
+        "only",
+        "check",
+        "ask",
+        "wonder",
+        "matter"
+      ]
+    },
+    "46": {
+      "I'm": [
+        "^",
+        "and",
+        "but",
+        "because",
+        "think",
+        "guess",
+        "hope",
+        "now"
+      ],
+      "go": [
+        "to",
+        "let's",
+        "lets",
+        "can",
+        "will",
+        "should",
+        "gotta",
+        "wanna",
+        "must",
+        "i'll",
+        "could"
+      ],
+      "in": [
+        "come",
+        "get",
+        "is",
+        "was",
+        "be",
+        "log",
+        "sign",
+        "check",
+        "live",
+        "put",
+        "plug",
+        "all",
+        "back"
+      ]
+    },
+    "66": {
+      "no": [
+        "^",
+        "oh",
+        "say",
+        "said",
+        "says",
+        "there's",
+        "theres",
+        "have",
+        "had",
+        "has",
+        "got",
+        "with",
+        "means",
+        "yes",
+        "or",
+        "absolutely",
+        "definitely",
+        "almost",
+        "no"
+      ],
+      "on": [
+        "come",
+        "hold",
+        "turn",
+        "turned",
+        "put",
+        "going",
+        "based",
+        "depends",
+        "rely",
+        "count",
+        "log",
+        "logged",
+        "sign",
+        "keep",
+        "go",
+        "goes",
+        "went",
+        "right",
+        "click",
+        "tap",
+        "sit",
+        "work",
+        "working",
+        "focus",
+        "agree",
+        "comment",
+        "catch",
+        "move",
+        "moving",
+        "carry",
+        "and",
+        "so",
+        "early",
+        "later",
+        "out",
+        "back",
+        "it's",
+        "its",
+        "still"
+      ]
+    },
+    "363": {
+      "D&D": [
+        "play",
+        "playing",
+        "played",
+        "plays",
+        "our",
+        "run",
+        "running",
+        "ran",
+        "dm",
+        "dming",
+        "love",
+        "about",
+        "weekly",
+        "some",
+        "more",
+        "tonight's"
+      ]
+    },
+    "463": {
+      "first": "god"
+    },
+    "4663": {
+      "home": [
+        "headed",
+        "heading",
+        "head",
+        "going",
+        "went",
+        "back",
+        "at",
+        "get",
+        "got",
+        "getting",
+        "come",
+        "came",
+        "coming",
+        "walking",
+        "walked",
+        "driving",
+        "drove",
+        "way"
+      ],
+      "good": [
+        "very",
+        "so",
+        "pretty",
+        "a",
+        "looks",
+        "feel",
+        "feels",
+        "is",
+        "too"
+      ]
+    },
+    "9292": {
+      "first": "wawa"
+    },
+    "64448": {
+      "might": [
+        "i",
+        "you",
+        "we",
+        "they",
+        "he",
+        "she",
+        "it",
+        "that",
+        "this",
+        "which",
+        "who",
+        "there",
+        "and"
+      ],
+      "night": [
+        "last",
+        "good",
+        "every",
+        "all",
+        "one",
+        "the",
+        "a",
+        "at",
+        "late",
+        "tomorrow",
+        "date",
+        "movie",
+        "game",
+        "friday",
+        "saturday",
+        "sunday",
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday"
+      ]
+    }
+  }
+}

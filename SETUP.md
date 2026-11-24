@@ -10,7 +10,15 @@ This is the exact path that works. The two non-obvious rules:
 ## 0. Prerequisites
 
 - Nokia 2780 (KaiOS 3.1), USB **data** cable.
-- Mac with Python 3 and `adb`.
+- Mac with Python 3 and `adb` (`zip` and `shasum` ship with macOS).
+- This repo:
+  ```sh
+  git clone https://github.com/elliscode/kaios-debounced-keyboard.git
+  cd kaios-debounced-keyboard
+  ```
+  The ready-to-deploy build is committed under `build/`, so a first deploy
+  needs no build step.
+- Optional: Node.js, only to run the tests (`make test`).
 - JScalated shared ADB key:
   <https://jscalated.netlify.app/downloads/jscalated-adb-key.zip>
   Its private half is public — use USB only, never wireless ADB.
@@ -44,10 +52,13 @@ On the phone: **Settings → Storage → USB storage** (so adbd is visible).
 
 ## 2. Start the server and tunnel
 
+From the repo folder:
+
 ```sh
-cd kaios-debounce-clean
-python3 tools/serve.py
+python3 tools/serve.py        # or: make serve
 ```
+
+Leave it running.
 
 Second terminal, with the same key:
 
@@ -65,6 +76,9 @@ ADB_VENDOR_KEYS=~/.config/kaios/adbkey adb -s <serial> shell \
 ```
 
 It must print `200`.
+
+`adb reverse` is lost whenever the phone reboots or is replugged: run
+`reverse-all.sh` again each time.
 
 ## 3. Load the privileged System page (again, after the reboot)
 
@@ -98,17 +112,27 @@ If nothing happens, the loader in step 3 was not active. Redo step 3.
 
 ## 5. Reboot and verify
 
-Power off/on. Then:
+Power off/on. Then re-run the tunnel (the reboot dropped it):
 
-- Open **Messages** → new message. The suggestion bar must be **pink**.
+```sh
+ADB_VENDOR_KEYS=~/.config/kaios/adbkey tools/reverse-all.sh
+```
+
+- Open **Messages** → new message. The suggestion bar must be **soft pink**
+  (stock is gray).
 - Open `http://keyboard.localhost/config.html`.
-  - Default same-key cooldown is **100 ms**.
+  - Default same-key cooldown is **110 ms**.
   - Press **100 ms cooldown** (or **1 s cooldown**) → **Save**.
   - Type `666666` fast, then `64646`. Same-key repeats are limited;
     alternating keys are untouched.
+- Predictive (T9) mode: press `4` → **I** is the first word. Type `headed`,
+  space, then `4663` → **home**.
+- Select: in Messages, type a word in predictive mode and press Select once.
+  The word is committed and nothing is sent. Wait ~1 s and press Select again
+  to send.
 - Optional: enable **Show JS marker** → Save. The candidate bar gets a left
-  edge: green = JS active + cooldown > 0, yellow = JS active + cooldown 0,
-  no edge = JS not active. Turn it off afterwards.
+  edge: green = JS active + the current mode's cooldown > 0, yellow = JS
+  active + cooldown 0, no edge = JS not active. Turn it off afterwards.
 
 ## 6. Multiple phones
 
@@ -143,6 +167,35 @@ A factory reset also removes the install, if you ever want a clean slate.
 No redeploy. Open `http://keyboard.localhost/config.html`, change values, Save.
 They live in the keyboard origin's `localStorage` and apply within ~1 second.
 
+Prediction rules are on the same page, under **Prediction rules** (format in
+[README.md](README.md#prediction-rules-predictive--t9-mode)). Edit them there,
+or load a file:
+
+1. Edit `profiles/predict.json` on the Mac.
+2. Make sure `tools/serve.py` is running and `reverse-all.sh` has been run
+   since the phone's last reboot.
+3. On the config page press **Load** (URL
+   `http://127.0.0.1:8088/profiles/predict.json`), check the summary, then
+   **Save**.
+
+## Changing the code (rebuild and redeploy)
+
+Only needed if you edit files under `app/`.
+
+1. `make test` (optional, needs Node).
+2. `make build`. This rebuilds `build/deploy/application.zip`,
+   `build/deploy_selfcontained.js` and both `SHA256SUMS.txt` files.
+3. Restart nothing: `serve.py` reads the file on every request.
+4. On the phone, do step 3 (JScalated loader), then deploy with a **number you
+   haven't used before**, so the phone can't reuse a cached copy:
+   ```
+   javascript:import('http://127.0.0.1:8088/d2')
+   ```
+   (`/d3`, `/d4`, … next time). Check the log for `DEPLOY OK`.
+5. Reboot, then re-run `reverse-all.sh`.
+
+Settings and prediction rules saved on the phone survive a redeploy.
+
 ## Troubleshooting
 
 - **No `adb devices` entry:** USB storage mode, data cable, or step 1/reboot not
@@ -153,3 +206,14 @@ They live in the keyboard origin's `localStorage` and apply within ~1 second.
   the URL. If the Mac firewall prompts, allow Python.
 - **No pink bar after reboot:** deploy didn't land; check `[kbdeploy]` and repeat
   steps 3–5. If the keyboard is missing, run `/r` and reboot.
+- **Bar is the old bright pink, or a change you made doesn't show:** the phone
+  got an older build. Check `make build` ran, then redeploy with a fresh
+  `/dN` number and reboot.
+- **Check what actually loaded:** after a reboot, open any text field and run
+  `adb logcat -d | grep "debounce] boot"`. `index.html is current` is normal.
+  `index.html is a stale cached copy` means the phone reused an old cached
+  keyboard page; `debounce.js` then loads the new parts itself, so it still
+  works. Changes made only in `index.html` won't show until that cache
+  clears, so put new behavior in the JS files.
+- **Load from URL fails (network/CORS):** `serve.py` isn't running, or the
+  tunnel was lost on reboot. Re-run `reverse-all.sh`.

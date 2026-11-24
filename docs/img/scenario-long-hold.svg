@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 290" width="680" height="290" role="img" aria-label="Long hold, bounce 20 ms after release">
+<title>Long hold, bounce 20 ms after release</title>
+<style>
+  .t { fill: #222; font-family: sans-serif; font-size: 14px; }
+  .b { font-weight: bold; }
+  .s { fill: #555; font-family: sans-serif; font-size: 12px; }
+  .in { fill: #fff; font-family: sans-serif; font-size: 13px; font-weight: bold; }
+  .ind { fill: #222; font-family: sans-serif; font-size: 13px; font-weight: bold; }
+  .ax { stroke: #777; stroke-width: 1; fill: none; }
+  .grid { stroke: #bbb; stroke-width: 1; stroke-dasharray: 3 3; fill: none; }
+  .sig { stroke: #111; stroke-width: 2.5; fill: none; }
+  .bnc { stroke: #d62828; stroke-width: 2.5; fill: none; }
+  .bncl { stroke: #d62828; stroke-width: 1.5; stroke-dasharray: 4 3; fill: none; }
+  .bt { fill: #d62828; font-family: sans-serif; font-size: 12px; font-weight: bold; }
+  @media (prefers-color-scheme: dark) {
+    .t { fill: #e6e6e6; }
+    .s { fill: #aaa; }
+    .ax { stroke: #999; }
+    .grid { stroke: #555; }
+    .sig { stroke: #f2f2f2; }
+    .bnc, .bncl { stroke: #ff5c5c; }
+    .bt { fill: #ff6b6b; }
+  }
+</style>
+<text class="t b" x="70" y="22">Long hold, bounce 20 ms after release</text>
+<text class="s" x="62" y="54" text-anchor="end">1 let go</text>
+<text class="s" x="62" y="104" text-anchor="end">0 pressed</text>
+<line class="grid" x1="70" y1="50" x2="650" y2="50"/>
+<line class="grid" x1="70" y1="100" x2="650" y2="100"/>
+<path class="sig" d="M70,50 V100 H505.0 V50 H534.0 M548.5,50 H650"/>
+<path class="bnc" d="M534.0,50 V100 H548.5 V50"/>
+<text class="s" x="287.5" y="116" text-anchor="middle">real press</text>
+<text class="bt" x="541.2" y="42" text-anchor="middle">bounce</text>
+<rect x="70" y="140" width="580" height="24" fill="#7b61c9" fill-opacity="0.12"/>
+<rect x="70.0" y="140" width="159.5" height="24" fill="#7b61c9" fill-opacity="0.85"/>
+<text class="t" x="235.5" y="157" text-anchor="start">Cooldown 110 ms (from press)</text>
+<rect x="70" y="180" width="580" height="24" fill="#c8323c" fill-opacity="0.12"/>
+<rect x="505.0" y="180" width="65.2" height="24" fill="#c8323c" fill-opacity="0.85"/>
+<text class="t" x="499.0" y="197" text-anchor="end">Hard gap 45 ms (from release)</text>
+<line class="bncl" x1="534.0" y1="50" x2="534.0" y2="212"/>
+<line class="ax" x1="70" y1="222" x2="650" y2="222"/>
+<line class="ax" x1="70.0" y1="222" x2="70.0" y2="227"/>
+<text class="s" x="70.0" y="241" text-anchor="middle">0</text>
+<line class="ax" x1="229.5" y1="222" x2="229.5" y2="227"/>
+<text class="s" x="229.5" y="241" text-anchor="middle">110</text>
+<line class="ax" x1="360.0" y1="222" x2="360.0" y2="227"/>
+<text class="s" x="360.0" y="241" text-anchor="middle">200</text>
+<line class="ax" x1="505.0" y1="222" x2="505.0" y2="227"/>
+<text class="s" x="505.0" y="241" text-anchor="middle">300</text>
+<line class="ax" x1="570.2" y1="222" x2="570.2" y2="227"/>
+<text class="s" x="570.2" y="241" text-anchor="middle">345</text>
+<line class="ax" x1="650.0" y1="222" x2="650.0" y2="227"/>
+<text class="s" x="650.0" y="241" text-anchor="middle">400</text>
+<text class="s" x="650" y="241" text-anchor="end" dx="0" dy="14">ms</text>
+<text class="t" x="70" y="276">Cooldown already over → hard gap drops it.</text>
+</svg>

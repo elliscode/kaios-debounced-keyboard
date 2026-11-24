@@ -3,9 +3,12 @@
   "GAP_HARD": 0,
   "GAP_SOFT": 0,
   "HOLD_SHORT": 0,
-  "LONE_HOLD": 15,
-  "COOLDOWN": 100,
-  "dropLoneShort": false,
+  "COOLDOWN_T9": 100,
+  "COOLDOWN_Abc": 100,
+  "COOLDOWN_abc": 100,
+  "COOLDOWN_ABC": 100,
+  "COOLDOWN_123": 100,
+  "SELECT_COOLDOWN": 1000,
   "showMarker": false,
   "debug": false
 }

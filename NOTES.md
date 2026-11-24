@@ -78,8 +78,14 @@ The keyboard app and `config.html` share the `keyboard.localhost` origin, so
 `localStorage` is the config channel:
 
 - key: `keyboard.debounce.v1`
-- JSON fields: `enabled`, `GAP_HARD`, `GAP_SOFT`, `HOLD_SHORT`, `LONE_HOLD`,
-  `COOLDOWN`, `dropLoneShort`, `showMarker`, `debug` (console only)
+- JSON fields: `enabled`, `GAP_HARD`, `GAP_SOFT`, `HOLD_SHORT`,
+  `COOLDOWN_T9`, `COOLDOWN_Abc`, `COOLDOWN_abc`, `COOLDOWN_ABC`,
+  `COOLDOWN_123`, `SELECT_COOLDOWN`, `showMarker`, `debug`
+  (console only). The old single `COOLDOWN` is still read: if it is present
+  and none of the per-mode keys are, it is copied into all five, and it is the
+  fallback for any other input mode.
+- key: `keyboard.predict.v1`: prediction rules, `{ "enabled", "rules" }`
+  (see README). Invalid or missing JSON falls back to the built-in defaults.
 - the keyboard polls every 1 s and also listens for the `storage` event;
 - the config page is served from the keyboard zip, so it needs no extra app.
 
@@ -94,16 +100,20 @@ Per key, no cross-key comparison. For the default rule:
 - `gap = thisDown - lastKeptUp[key]` (milliseconds)
 - `gap < GAP_HARD` → drop
 - `GAP_HARD ≤ gap < GAP_SOFT` and `hold < HOLD_SHORT` → drop
-- optional `dropLoneShort` for isolated short contacts
 
-`COOLDOWN` is a separate, exact same-key rate limit:
+The cooldown is a separate, exact same-key rate limit, one value per input
+mode (`keypad.inputMode`: T9, Abc, abc, ABC, 123):
 
-- `thisDown - lastKeptDown[key] < COOLDOWN` → drop, regardless of hold.
+- `thisDown - lastKeptDown[key] < COOLDOWN_<mode>` → drop, regardless of hold.
 
-Default `COOLDOWN` is **100 ms** (down-to-down); set `0` to disable it.
-For “at most one press of a key per second”, set `COOLDOWN=1000` and
+Default is **110 ms** (down-to-down) in every mode; set `0` to disable it.
+For “at most one press of a key per second”, set the cooldowns to 1000 and
 `GAP_HARD=GAP_SOFT=HOLD_SHORT=0`. For ~5 same-key presses/sec, use
-`COOLDOWN≈200` (down-to-down, exact).
+`≈200` (down-to-down, exact).
+
+Select (Enter) gets only `SELECT_COOLDOWN` (default 1000 ms, any mode): a
+second Enter keydown within that time of the last kept one is dropped with its
+keypress/keyup. No gap rules and no deferral apply to Enter.
 
 Note: a 1 s same-key cooldown makes multi-tap impossible (`666` for `o` needs
 2 s). That is inherent to the rule; use a shorter cooldown if multi-tap matters.
@@ -121,4 +131,6 @@ the saved symlink back. Reboot after it.
 
 - End-call / power key (never reaches the keyboard).
 - Missed presses (debounce cannot fix those).
-- T9 ranking/context (the native TouchPal predictor is untouched).
+- T9 ranking in general: the TouchPal engine is untouched. Only digit
+  sequences with a user rule are reordered (`app/js/predict_*.js`), after
+  TouchPal produces its list.
