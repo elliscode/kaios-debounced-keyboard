@@ -33,7 +33,8 @@ Then on the Mac:
 
 ```sh
 python3 tools/serve.py
-ADB_VENDOR_KEYS=/path/to/adbkey tools/reverse-all.sh
+# JScalated shared key, extracted once (see SETUP.md):
+ADB_VENDOR_KEYS=~/.config/kaios/adbkey tools/reverse-all.sh
 ```
 
 And on the phone (loader must be redone after the reboot):

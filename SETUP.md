@@ -32,10 +32,12 @@ On the phone: **Settings → Storage → USB storage** (so adbd is visible).
    - Wait until the log box reports the XPI/profile and request staged.
 5. **Turn the whole phone off and on.** A browser reload is not a reboot. The
    XPI installs the matching ADB key and enables the service on boot.
-6. On the Mac:
+6. On the Mac, keep the key somewhere durable (not in the repo):
    ```sh
-   unzip jscalated-adb-key.zip           # gives adbkey + adbkey.pub
-   ADB_VENDOR_KEYS=$PWD/adbkey adb devices
+   mkdir -p ~/.config/kaios
+   unzip -o jscalated-adb-key.zip -d ~/.config/kaios   # adbkey + adbkey.pub
+   chmod 600 ~/.config/kaios/adbkey
+   ADB_VENDOR_KEYS=~/.config/kaios/adbkey adb devices
    ```
    Expect `<serial>  device`. If it says `unauthorized`, toggle USB storage /
    replug and redo step 1. If nothing appears, check the cable is a data cable.
@@ -50,15 +52,15 @@ python3 tools/serve.py
 Second terminal, with the same key:
 
 ```sh
-ADB_VENDOR_KEYS=/path/to/adbkey adb -s <serial> reverse tcp:8088 tcp:8088
+ADB_VENDOR_KEYS=~/.config/kaios/adbkey adb -s <serial> reverse tcp:8088 tcp:8088
 # all connected phones at once:
-ADB_VENDOR_KEYS=/path/to/adbkey tools/reverse-all.sh
+ADB_VENDOR_KEYS=~/.config/kaios/adbkey tools/reverse-all.sh
 ```
 
 Verify from the phone side:
 
 ```sh
-ADB_VENDOR_KEYS=/path/to/adbkey adb -s <serial> shell \
+ADB_VENDOR_KEYS=~/.config/kaios/adbkey adb -s <serial> shell \
   'curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8088/d'
 ```
 
@@ -113,7 +115,8 @@ Power off/on. Then:
 Each phone is independent; the Mac server/build is shared.
 
 1. Do step 1 on each fresh phone (ADB enable + full reboot).
-2. Plug in the phones and run `ADB_VENDOR_KEYS=… tools/reverse-all.sh`.
+2. Plug in the phones and run
+   `ADB_VENDOR_KEYS=~/.config/kaios/adbkey tools/reverse-all.sh`.
 3. Do steps 3–5 one phone at a time (unplug the others if that helps).
 4. Configure each phone on its own `config.html`; config is per phone.
 
