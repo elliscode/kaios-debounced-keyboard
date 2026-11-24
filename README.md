@@ -15,7 +15,39 @@ patched build is live.
   the phone needs no XHR (the System page's CSP blocks it).
 - `deploy/fs_recover.js` — rollback to the stock keyboard.
 - `tools/` — build, packaging, signing, and the dev server.
-- `profiles/1s-cooldown.json` — the strict same-key profile (1 press/second/key).
+- `profiles/100ms-cooldown.json` and `profiles/1s-cooldown.json` — reference
+  profiles.
+
+## The ADB key (where it comes from)
+
+We did **not** generate a key. The phone trusts the **JScalated shared ADB
+key**, which is installed by JScalated's "Enable ADB" XPI. Download the matching
+computer half from the official JScalated site:
+
+<https://jscalated.netlify.app/downloads/jscalated-adb-key.zip>
+
+That bundle contains `adbkey` (private half) and `adbkey.pub` (public half), and
+the private half is **intentionally public** — it is a community key, not a
+secret. Because of that:
+
+- use **USB ADB only**, never JScalated's wireless ADB option;
+- keep the key out of this repo (`.gitignore` blocks `adbkey`, `*.pem`, and
+  `jscalated-adb-key*`);
+- re-download it if you lose it. It is not recoverable from the phone.
+
+Extract it once to a durable location on the Mac:
+
+```sh
+mkdir -p ~/.config/kaios
+unzip -o jscalated-adb-key.zip -d ~/.config/kaios
+chmod 600 ~/.config/kaios/adbkey
+export ADB_VENDOR_KEYS=~/.config/kaios/adbkey   # or put this in ~/.zshrc
+```
+
+Every `adb` command in this repo assumes that key at
+`~/.config/kaios/adbkey`. The `ADB_VENDOR_KEYS` variable is read when the adb
+server starts; `adb reverse` must be re-run whenever a phone is replugged or
+rebooted.
 
 ## The path for a new phone
 
