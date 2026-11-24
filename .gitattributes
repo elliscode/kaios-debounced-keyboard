@@ -1,0 +1,4 @@
+# Generated deploy payload: text, but a single enormous base64 line.
+build/deploy_selfcontained.js -diff linguist-generated
+build/deploy/application.zip binary
+build/deploy/application.plain.zip binary

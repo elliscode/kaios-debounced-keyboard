@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
+  <meta charset="utf-8">
+  <title>Keyboard</title>
+  <script defer="" type="text/javascript" src="js/keypad_symbols.js"></script>
+  <script defer="" type="text/javascript" src="js/imeconnect_sdk.js"></script>
+  <script defer="" type="text/javascript" src="js/keypad_t9.js"></script>
+  <script defer="" type="text/javascript" src="js/keypad_emoji.js"></script>
+  <script defer="" type="text/javascript" src="js/keypad_maps.js"></script>
+  <script defer="" type="text/javascript" src="js/keypad.js"></script>
+
+  <script defer="" src="http://shared.localhost/js/utils/common/lazy_loader.js"></script>
+  <script defer="" src="http://shared.localhost/js/session/task_scheduler.js"></script>
+  <script defer="" src="http://shared.localhost/js/session/lib_session.js"></script>
+  <script defer="" src="http://shared.localhost/js/session/settings/settings_observer.js"></script>
+  <script defer="" src="http://shared.localhost/js/session/device_capability/device_capability.js"></script>
+  <script defer="" src="http://shared.localhost/js/helper/keypad/keypad_helper.js"></script>
+  <script defer="" src="http://shared.localhost/js/utils/l10n/l10n.js"></script>
+  <!-- key-bounce filter: core (pure logic) then the live wrapper, before the app
+       constructs its Keypad so the prototype patch is in place. -->
+  <script defer="" type="text/javascript" src="js/debounce_core.js"></script>
+  <script defer="" type="text/javascript" src="js/debounce_config.js"></script>
+  <script defer="" type="text/javascript" src="js/debounce.js"></script>
+  <script defer="" type="text/javascript" src="js/keyboard_app.js"></script>
+  <!-- Localization -->
+  <meta name="defaultLanguage" content="en-US">
+  <meta name="availableLanguages" content="en-US:202208231920, es-US:202208231920">
+  <link href="/locales-obj/{locale}.json" rel="localization">
+  <link rel="stylesheet" type="text/css" href="http://shared.localhost/style/gaia_theme/gaia-theme.css">
+  <link rel="stylesheet" type="text/css" href="http://shared.localhost/style/gaia_icons/gaia-icons.css">
+  <link rel="stylesheet" type="text/css" href="style/keyboard.css">
+<meta name="appVersion" content="2.2"></head>
+
+<!-- The keyboard itself should be "ltr", to override the attribute set at documentElement by l10n.js -->
+<body dir="ltr">
+  <div id="symbols">
+    <div id="symbols-background"></div>
+    <div id="symbols-content">
+      <div id="recent-emoji"></div>
+      <div id="symbols-container"></div>
+    </div>
+  </div>
+  <div id="soft-keys">
+    <span class="soft-key left"></span>
+    <span class="soft-key"></span>
+    <span class="soft-key right"></span>
+  </div>
+  <div id="candidates">
+    <div id="candidates-container">
+      <div id="candidates-scrollable"></div>
+    </div>
+    <div id="candidates-input-number" class="hide"></div>
+    <div id="candidates-page-indicator">
+      <div id="left-indicator"></div>
+      <div id="right-indicator"></div>
+    </div>
+  </div>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "enabled": true,
+  "GAP_HARD": 0,
+  "GAP_SOFT": 0,
+  "HOLD_SHORT": 0,
+  "LONE_HOLD": 15,
+  "COOLDOWN": 1000,
+  "dropLoneShort": false,
+  "showMarker": false,
+  "debug": false
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1">
+  <title>Debounce config</title>
+  <script defer src="js/debounce_config.js"></script>
+  <script defer src="js/config.js"></script>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; padding: 0; background: #111; color: #eee;
+      font-family: sans-serif; font-size: 16px; }
+    body { padding: 8px 10px 24px; }
+    h1 { font-size: 18px; margin: 0 0 4px; }
+    p.hint { color: #aaa; font-size: 12px; margin: 0 0 12px; }
+    .row { display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; padding: 7px 0; border-bottom: 1px solid #333; }
+    .row label { flex: 1; }
+    .row input[type=number] { width: 78px; font-size: 16px; padding: 4px;
+      background: #222; color: #fff; border: 1px solid #555; border-radius: 4px; }
+    .row input[type=checkbox] { width: 22px; height: 22px; }
+    .buttons { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+    button { font-size: 15px; padding: 8px 12px; border-radius: 6px;
+      border: 1px solid #666; background: #2a2a2a; color: #fff; }
+    button:focus, input:focus { outline: 2px solid #ff33aa; outline-offset: 1px; }
+    #status { margin-top: 12px; font-size: 14px; color: #9f9; white-space: pre-wrap; }
+    #status.error { color: #f88; }
+  </style>
+</head>
+<body>
+  <h1>Keyboard debounce</h1>
+  <p class="hint">Saved in the keyboard app's local storage. Applies within ~1 second and survives reboot.</p>
+
+  <div class="row"><label for="enabled">Enabled</label>
+    <input id="enabled" type="checkbox"></div>
+  <div class="row"><label for="GAP_HARD">Hard gap (ms)</label>
+    <input id="GAP_HARD" type="number" min="0" max="500" step="1"></div>
+  <div class="row"><label for="GAP_SOFT">Soft gap (ms)</label>
+    <input id="GAP_SOFT" type="number" min="0" max="500" step="1"></div>
+  <div class="row"><label for="HOLD_SHORT">Short hold (ms)</label>
+    <input id="HOLD_SHORT" type="number" min="0" max="500" step="1"></div>
+  <div class="row"><label for="LONE_HOLD">Lone hold (ms)</label>
+    <input id="LONE_HOLD" type="number" min="0" max="500" step="1"></div>
+  <div class="row"><label for="COOLDOWN">Same-key cooldown (ms)</label>
+    <input id="COOLDOWN" type="number" min="0" max="1000" step="1"></div>
+  <div class="row"><label for="dropLoneShort">Drop lone short</label>
+    <input id="dropLoneShort" type="checkbox"></div>
+  <div class="row"><label for="showMarker">Show JS marker (left edge)</label>
+    <input id="showMarker" type="checkbox"></div>
+  <div class="row"><label for="debug">Debug console log</label>
+    <input id="debug" type="checkbox"></div>
+
+  <div class="buttons">
+    <button id="save" type="button">Save</button>
+    <button id="reload" type="button">Reload</button>
+    <button id="defaults" type="button">Defaults</button>
+    <button id="profile-100ms" type="button">100 ms cooldown</button>
+    <button id="profile-1s" type="button">1 s cooldown</button>
+  </div>
+  <div id="status">Loading…</div>
+</body>
+</html>

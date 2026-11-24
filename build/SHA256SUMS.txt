@@ -1,0 +1,2 @@
+11b0e7104ec0c19e69fc842444ddaf037043d52ccbfeb0c31c04a99aa65d7ae4  deploy/application.zip
+c45549990f12d0453ad74a281deef3d237f22bf80f4c80368aeeb5d2cba16ab4  deploy_selfcontained.js
