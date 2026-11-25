@@ -25,9 +25,7 @@ patched build is live.
 
 We did **not** generate a key. The phone trusts the **JScalated shared ADB
 key**, which is installed by JScalated's "Enable ADB" XPI. Download the matching
-computer half from the official JScalated site:
-
-<https://jscalated.netlify.app/downloads/jscalated-adb-key.zip>
+computer half from the official JScalated site, search yourself.
 
 That bundle contains `adbkey` (private half) and `adbkey.pub` (public half), and
 the private half is **intentionally public** — it is a community key, not a
