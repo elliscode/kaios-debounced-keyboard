@@ -127,6 +127,44 @@ Note: a 1 s same-key cooldown makes multi-tap impossible (`666` for `o` needs
 `deploy/fs_recover.js` (served as `/r`) renames the current one aside and puts
 the saved symlink back. Reboot after it.
 
+## Loading rules over the network
+
+Config page → **Load from URL** (`prFetch` in `app/js/config.js`) reads
+`https://keyboard.elliscode.com/rules/predict.json` (CloudFront + S3,
+`/rules/*` CachingDisabled, SimpleCORS, file stored with
+`Cache-Control: no-cache`). Findings from getting this to work on the 2780
+(2026-11-25):
+
+1. **`fetch(url, { cache: "no-store" })` failed every time** with
+   `NetworkError when attempting to fetch resource.`, while the URL was fine
+   from a desktop browser and from `curl` with `Origin: http://keyboard.localhost`.
+2. **Switching to XHR alone did not fix it.** XHR failed with a bare
+   network error (status 0) about half the time.
+3. **The failures followed rule changes, not time.** Load → edit in
+   `admin.html` → Load within 30 s failed. Loading again with no change
+   worked. It was not idle connections, not USB, and not the server: a save is
+   one atomic `PutObject`, nothing is cached at CloudFront, and every response
+   checked from the Mac was correct.
+4. **Cause: the phone's HTTP cache.** Because of `no-cache`, Gecko keeps a copy
+   and revalidates (`If-None-Match`). Unchanged file → CloudFront `304`
+   (no body, no ACAO header; Gecko reuses the cached entry) → works. Changed
+   file → full `200` → fails on the phone. That also explains (1): `no-store`
+   always takes the full-`200` path. Exactly why Gecko 84 rejects that `200`
+   wasn't determined; its CORS errors don't reach logcat.
+5. **Fix:** XHR with a unique `?_=<timestamp>` (the cache is never involved;
+   S3 ignores the parameter), no request headers (no preflight; CloudFront
+   answers `OPTIONS` on `/rules/*` with 403), and up to 3 tries on network
+   errors. Verified on d31: save at 17:35:44, Load at 17:36:00, first try.
+
+Ruled out along the way: IPv6 (the phone is on IPv6-only mobile data, but
+foursure is dual-stack too and works), CSP or permissions on the core keyboard
+app (it reaches the internet), TLS (same setup as foursure).
+
+Related: `kaios-calorie-counter/notes/kaios-fetch-vs-xhr-cors-mystery.md`
+(fetch vs XHR on KaiOS 3.1). Foursure (`foursure/frontend/js/puzzle.js`) also
+uses XHR and keeps every file it loads in IndexedDB, which would hide the same
+failures.
+
 ## Not covered
 
 - End-call / power key (never reaches the keyboard).

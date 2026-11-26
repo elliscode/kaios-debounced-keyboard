@@ -195,7 +195,23 @@ rules**:
 2. **Load from URL** via the dev server: run `python3 tools/serve.py` and
    `tools/reverse-all.sh` (`adb reverse tcp:8088 tcp:8088`), then press
    **Load** with `http://127.0.0.1:8088/profiles/predict.json`, and **Save**.
-3. **Any URL that sends CORS headers**, e.g. a raw GitHub file or a gist.
+3. **Load from URL** from the hosted copy (the normal source):
+   `https://keyboard.elliscode.com/rules/predict.json`, edited at
+   `https://keyboard.elliscode.com/admin.html`. Press **Load**, then **Save**.
+   Any other URL works if it sends `Access-Control-Allow-Origin`, e.g. a raw
+   GitHub file or a gist.
+
+**Load** uses `XMLHttpRequest`, not `fetch()`, on purpose: on KaiOS 3.1
+(Gecko 84) `fetch()` GETs from an installed app to CloudFront fail with
+`NetworkError`, while XHR to the same URL works. See
+[the calorie-counter note](https://github.com/elliscode/kaios-calorie-counter/blob/main/notes/kaios-fetch-vs-xhr-cors-mystery.md).
+It sends no extra request headers, so there is no CORS preflight. It also adds
+a unique `?_=<timestamp>` to the URL so the phone's HTTP cache is never used:
+with a cached copy, the first Load after the rules changed failed every time
+(the revalidation that returns a new `200` fails on the phone; a `304` works).
+Network errors are retried up to 3 times.
+The last URL you pressed **Load** with is remembered (localStorage
+`keyboard.predict.url.v1`), so it only has to be typed once.
 
 Saved rules apply within about 1 s, with no reboot. The **Test a rule** box
 shows what a rule does to a sample list without typing. Run the unit tests with

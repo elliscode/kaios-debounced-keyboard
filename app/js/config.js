@@ -3,6 +3,7 @@
  *
  * Debounce settings -> DebounceConfig (localStorage keyboard.debounce.v1).
  * Prediction rules  -> PredictConfig  (localStorage keyboard.predict.v1).
+ * Last "Load from URL" URL -> localStorage keyboard.predict.url.v1.
  * The keyboard app reads the same origin storage, so no permission or storage
  * service is involved.
  */
@@ -185,13 +186,60 @@
     setStatus(prStatus, "Defaults shown. Press Save to apply.");
   }
 
+  // KaiOS 3.1 (Gecko 84): fetch() GETs to CloudFront fail with NetworkError,
+  // XHR works. See kaios-calorie-counter/notes/kaios-fetch-vs-xhr-cors-mystery.md.
+  // No request headers on purpose: keeps it a simple GET with no preflight
+  // (CloudFront's /rules/* answers OPTIONS with 403). A status of 0 without
+  // onerror also rejects, as "HTTP 0".
+  function xhrGetText(url) {
+    return new Promise(function (resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      // Unique query string: skip the phone's HTTP cache so every Load is a
+      // plain, unconditional GET (no If-None-Match revalidation). S3 and the
+      // dev server ignore the parameter.
+      xhr.open("GET", url + (url.indexOf("?") < 0 ? "?" : "&") + "_=" + Date.now(), true);
+      xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) resolve(xhr.responseText);
+        else reject({ http: true, message: "HTTP " + xhr.status + " " + (xhr.statusText || "") });
+      };
+      xhr.onerror = function () {
+        reject(new Error("network error (XHR status=" + xhr.status + " readyState=" + xhr.readyState + ")"));
+      };
+      xhr.send();
+    });
+  }
+
+  // Remember the last URL typed into Load from URL; it's long to type on T9.
+  var URL_KEY = "keyboard.predict.url.v1";
+
+  function prRestoreUrl() {
+    var saved = null;
+    try { saved = localStorage.getItem(URL_KEY); } catch (e) {}
+    if (saved) document.getElementById("pr-url").value = saved;
+  }
+
+  // Mobile data on the phone drops the odd request (seen as an XHR network
+  // error while the server is fine), so retry network errors a couple of times.
+  // HTTP errors are real answers and are not retried.
+  function xhrGetTextRetry(url, tries, onRetry) {
+    return xhrGetText(url).catch(function (e) {
+      if ((e && e.http) || tries <= 1) throw e;
+      if (onRetry) onRetry(e);
+      return new Promise(function (r) { setTimeout(r, 1500); }).then(function () {
+        return xhrGetTextRetry(url, tries - 1, onRetry);
+      });
+    });
+  }
+
   function prFetch() {
     var url = document.getElementById("pr-url").value.trim();
     if (!url) { setStatus(prStatus, "Enter a URL first.", true); return; }
+    try { localStorage.setItem(URL_KEY, url); } catch (e) {}
     setStatus(prStatus, "Loading " + url + " …");
-    fetch(url, { cache: "no-store" }).then(function (res) {
-      if (!res.ok) throw { http: true, message: "HTTP " + res.status + " " + (res.statusText || "") };
-      return res.text();
+    var attempt = 1;
+    xhrGetTextRetry(url, 3, function () {
+      attempt++;
+      setStatus(prStatus, "Loading " + url + " … (retry " + (attempt - 1) + ")");
     }).then(function (text) {
       var r = parseRulesText(text);
       if (r.error) { setStatus(prStatus, "Loaded, but not usable: " + r.error, true); return; }
@@ -201,9 +249,11 @@
       setStatus(prStatus, "Loaded " + summary(r.obj.rules) + ". Not saved yet — press Save to apply.");
     }).catch(function (e) {
       if (e && e.http) { setStatus(prStatus, "Load failed: " + e.message, true); return; }
-      setStatus(prStatus, "Load failed (network or CORS): " + (e && e.message ? e.message : e) +
-        "\nFor 127.0.0.1:8088: run tools/serve.py on the Mac and `adb reverse tcp:8088 tcp:8088`." +
-        "\nOther hosts must send Access-Control-Allow-Origin (raw GitHub files and gists do).", true);
+      var dev = /^https?:\/\/(127\.0\.0\.1|localhost)[:\/]/.test(url);
+      setStatus(prStatus, "Load failed after " + attempt + " tries (network or CORS) for " + url + ": " + (e && e.message ? e.message : e) +
+        (dev ? "\nThis is the Mac dev server: run tools/serve.py on the Mac and `adb reverse tcp:8088 tcp:8088` (phone plugged in)." : "") +
+        "\nThe normal source is https://keyboard.elliscode.com/rules/predict.json." +
+        "\nOther hosts must send Access-Control-Allow-Origin.", true);
     });
   }
 
@@ -247,6 +297,7 @@
       document.getElementById(id).addEventListener("input", runTest);
     });
     prEnabled.addEventListener("change", runTest);
+    prRestoreUrl();
     prLoad();
   }
 

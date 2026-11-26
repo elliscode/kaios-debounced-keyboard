@@ -19,9 +19,9 @@ This is the exact path that works. The two non-obvious rules:
   The ready-to-deploy build is committed under `build/`, so a first deploy
   needs no build step.
 - Optional: Node.js, only to run the tests (`make test`).
-- JScalated shared ADB key:
-  <https://jscalated.netlify.app/downloads/jscalated-adb-key.zip>
-  Its private half is public — use USB only, never wireless ADB.
+- JScalated shared ADB key, from the official JScalated site (search for it
+  yourself; see the README). Its private half is public — use USB only, never
+  wireless ADB.
 
 On the phone: **Settings → Storage → USB storage** (so adbd is visible).
 
@@ -215,5 +215,21 @@ Settings and prediction rules saved on the phone survive a redeploy.
   keyboard page; `debounce.js` then loads the new parts itself, so it still
   works. Changes made only in `index.html` won't show until that cache
   clears, so put new behavior in the JS files.
-- **Load from URL fails (network/CORS):** `serve.py` isn't running, or the
-  tunnel was lost on reboot. Re-run `reverse-all.sh`.
+- **Load from URL fails (network/CORS):** for `127.0.0.1:8088`, `serve.py`
+  isn't running, or the tunnel was lost on reboot or unplug. Re-run
+  `reverse-all.sh`. For `https://keyboard.elliscode.com/…`, the phone doesn't
+  need to be plugged in. Check the error text names the URL you meant (the box
+  remembers the last URL), and that the phone runs a build with the
+  cache-busting Load (error starts "Load failed after 3 tries"). See
+  [NOTES.md → Loading rules over the network](NOTES.md#loading-rules-over-the-network).
+- **`/dN` does nothing and there's no `[kbdeploy]` line:** `adb reverse` was
+  dropped (unplugging the phone does this too). Check `adb reverse --list`,
+  run `reverse-all.sh`, deploy with a new number.
+- **`[kbdeploy]` lines are missing from `adb logcat -d`:** the phone's log
+  buffer is only 64 KiB and the debounce debug log fills it in minutes. Watch
+  live (`adb logcat | grep kbdeploy`) while deploying, or turn off **Debug
+  console log** on the config page.
+- **Which build is running?** `DEPLOY OK` means it's on disk; it runs after a
+  reboot. `payload zip=<bytes>` in the log should match
+  `ls -l build/deploy/application.zip`. Always use `make build`
+  (`tools/build_deploy.sh` alone leaves `deploy_selfcontained.js` stale).
