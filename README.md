@@ -5,7 +5,7 @@ configurable **same-key debounce/cooldown**, without root, without flashing, and
 without touching `/system`. The suggestion bar is pink so you can tell the
 patched build is live.
 
-**Quick start:** [SETUP.md](SETUP.md) · **How/why it works:** [NOTES.md](NOTES.md)
+**Quick start:** SETUP.md · **How/why it works:** NOTES.md
 
 ## What this repo contains
 
@@ -79,9 +79,9 @@ And on the phone (loader must be redone after the reboot):
    ```
 3. Reboot. Pink bar = patched keyboard live.
 
-Full details: [SETUP.md](SETUP.md). After editing anything under `app/`, run
+Full details: SETUP.md. After editing anything under `app/`, run
 `make build` and redeploy with a fresh `/d2`, `/d3`, … (see
-[SETUP.md → Changing the code](SETUP.md#changing-the-code-rebuild-and-redeploy)).
+SETUP.md → Changing the code).
 
 Tune it at `http://keyboard.localhost/config.html` — no redeploy, survives
 reboot. Default same-key cooldown is 110 ms in every input mode; the page also
@@ -187,7 +187,7 @@ touched and cost one object lookup per key press.
   TouchPal's casing if TouchPal offers it.
 - Arrow keys still scroll through the whole list after a reorder.
 
-The full default set is in [`profiles/predict.json`](profiles/predict.json).
+The full default set is in `profiles/predict.json`.
 There are three ways to change it, all on `config.html` under **Prediction
 rules**:
 
@@ -204,7 +204,8 @@ rules**:
 **Load** uses `XMLHttpRequest`, not `fetch()`, on purpose: on KaiOS 3.1
 (Gecko 84) `fetch()` GETs from an installed app to CloudFront fail with
 `NetworkError`, while XHR to the same URL works. See
-[the calorie-counter note](https://github.com/elliscode/kaios-calorie-counter/blob/main/notes/kaios-fetch-vs-xhr-cors-mystery.md).
+the calorie-counter note (`notes/kaios-fetch-vs-xhr-cors-mystery.md` in the
+kaios-calorie-counter repo).
 It sends no extra request headers, so there is no CORS preflight. It also adds
 a unique `?_=<timestamp>` to the URL so the phone's HTTP cache is never used:
 with a cached copy, the first Load after the rules changed failed every time

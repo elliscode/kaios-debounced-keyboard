@@ -1,8 +1,8 @@
 # Working on this repo
 
 KaiOS 3.1 (Gecko 84) keyboard replacement for the Nokia 2780. How it works:
-[NOTES.md](NOTES.md). Phone setup and deploy steps: [SETUP.md](SETUP.md).
-Settings and prediction rules: [README.md](README.md).
+NOTES.md. Phone setup and deploy steps: SETUP.md.
+Settings and prediction rules: README.md.
 
 ## Build and deploy
 

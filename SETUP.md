@@ -168,7 +168,7 @@ No redeploy. Open `http://keyboard.localhost/config.html`, change values, Save.
 They live in the keyboard origin's `localStorage` and apply within ~1 second.
 
 Prediction rules are on the same page, under **Prediction rules** (format in
-[README.md](README.md#prediction-rules-predictive--t9-mode)). Edit them there,
+README.md). Edit them there,
 or load a file:
 
 1. Edit `profiles/predict.json` on the Mac.
@@ -221,7 +221,7 @@ Settings and prediction rules saved on the phone survive a redeploy.
   need to be plugged in. Check the error text names the URL you meant (the box
   remembers the last URL), and that the phone runs a build with the
   cache-busting Load (error starts "Load failed after 3 tries"). See
-  [NOTES.md → Loading rules over the network](NOTES.md#loading-rules-over-the-network).
+  NOTES.md → Loading rules over the network.
 - **`/dN` does nothing and there's no `[kbdeploy]` line:** `adb reverse` was
   dropped (unplugging the phone does this too). Check `adb reverse --list`,
   run `reverse-all.sh`, deploy with a new number.
